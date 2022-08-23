@@ -1,0 +1,7 @@
+{
+  "projects": {
+    "default": "auth-54404",
+    "auth": "auth-54404"
+  },
+  "targets": {}
+}
