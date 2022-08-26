@@ -7,9 +7,14 @@
 
 // ignore_for_file: use_build_context_synchronously, unawaited_futures
 
+import 'dart:convert';
+import 'package:dio/dio.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:my_app/extensions/string_ext.dart';
 import 'package:my_app/importer.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 import '../constants.dart';
 import 'dashboard_screen.dart';
@@ -27,6 +32,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends State<LoginScreen> {
+  var dio = Dio();
+  late Response response ;
+
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -290,31 +298,32 @@ class LoginScreenState extends State<LoginScreen> {
           isLoading  = true;
         });
 
-
-
         String email = _emailController.value.text.toString();
         String password = _passwordController.value.text.toString();
-
-        FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password).then((value) => {
-
-            Nav.pushReplacement(
-                  context,
-                  screen: const DashboardScreen(),
-                  fullScreen: true,
-                  name: '/dashboard',
-                  
-                )
-
-        }).catchError((data){
-            
-            setState(() {
-              isLoggedIn = false;
-               isLoading  = false;
-            });
-
-        });
-        
+        authenticate(email,password);
   }
+
+          void authenticate(String email , String password) async {
+            // This example uses the Google Books API to search for books about http.
+            // https://developers.google.com/books/docs/overview
+
+              try {
+                
+                dio.options.headers["Access-Control-Allow-Origin"] = "*";
+                dio.options.headers["Access-Control-Allow-Credentials"] = true;
+                dio.options.headers["Access-Control-Allow-Headers"] = "*";
+                dio.options.headers["Access-Control-Allow-Methods"] = "*";
+                
+                response = await dio.post(BASE_URL+LOGIN_URL
+                
+                , data: {'login_id': email, 'password': password});
+                print(response.statusCode);
+              } catch (error) {
+                print(error.toString());
+                // Catch and throw your exceptions
+              }
+
+            }
 
   void _forgotPasswordAction() {
      Nav.pushReplacement(
